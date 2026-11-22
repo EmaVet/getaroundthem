@@ -353,6 +353,9 @@ input[aria-invalid=true],textarea[aria-invalid=true]{border-color:var(--error);b
 .check input{flex:none;width:24px;height:24px;margin:.15rem 0 0;accent-color:var(--green)}
 .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
 .status{margin-top:1rem}
+.sent-box{border:2px solid var(--green);border-radius:var(--radius);padding:1rem;background:#F1F7F4}
+.sent-box h5,.error-summary h5{margin:0 0 .35rem;font-size:1.05rem}
+.sent-box p,.error-summary p{margin:0}
 .status .ph-block{font-family:var(--f-body);font-size:1rem}
 
 /* drop-ins + footer */
@@ -621,6 +624,8 @@ const CONFIG = {
   // Published email: shown only as an "Email us" link, never as text on the page.
   emailTo: '9260@bendigoadelaide.com.au',
   emailSubject: 'Grant Submission',
+  // Where the two forms post. A small relay that emails the submission on and stores nothing.
+  apiUrl: 'https://form-relay-production-875a15bc.up.railway.app/api/enquiry',
   companyUrl: 'https://bayandbasincommunityfinancialservices.com/',
   contact: null,           // { name, phone, email } — James Marin or Keith Robinson? (open)
   privacyPolicyUrl: null,  // Bay & Basin Community Financial Services privacy policy
@@ -1486,13 +1491,54 @@ function submitEnquiry(){
     timeOnFormMs: Date.now() - formStartedAt,   // server rejects implausibly fast submits
     website: fields.website.value                // honeypot — must be empty
   };
-  stubPost(payload);
+  sendEnquiry(payload);
 }
-// STUB — replaced in session 2 with fetch(POST /api/enquiry). Nothing leaves the browser.
-function stubPost(payload){
-  console.log('[STUB] POST /api/enquiry — payload shape:', JSON.parse(JSON.stringify(payload)));
-  track(payload.type === 'interest' ? 'interest_submitted' : 'enquiry_submitted',{program:payload.program});
-  $('#ef-status').innerHTML = `<div class="ph-block"><strong>Preview only — nothing has been sent.</strong> This form isn’t connected yet. In the live version your details would go to the Community Bank and you’d see a confirmation here.${payload.type === 'interest' ? ' Next step: continue to SmartyGrants below.' : ''}</div>`;
+// Sends the form to the relay, which emails it to the Community Bank's team. Nothing is stored.
+let sending = false;
+async function sendEnquiry(payload){
+  if (sending) return;
+  const btn = $('#ef-send'), status = $('#ef-status');
+  const label = btn.textContent;
+  sending = true;
+  btn.disabled = true; btn.textContent = 'Sending…';
+  status.innerHTML = '';
+  let ok = false, code = 'network';
+  try {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 20000);
+    const res = await fetch(CONFIG.apiUrl, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload), signal: ctl.signal
+    });
+    clearTimeout(timer);
+    let data = null; try { data = await res.json(); } catch(e) {}
+    ok = res.ok && data && data.ok === true;
+    if (!ok) code = (data && data.error) || 'server';
+  } catch(e) { code = 'network'; }
+  sending = false;
+
+  if (ok){
+    track(payload.type === 'interest' ? 'interest_submitted' : 'enquiry_submitted',{program:payload.program});
+    btn.hidden = true;
+    $('#enquiry').querySelectorAll('input, textarea').forEach(el => { el.disabled = true; });
+    status.innerHTML = `<div class="sent-box" tabindex="-1" id="ef-sent"><h5>Thanks — your details have been sent.</h5><p>${
+      payload.type === 'interest'
+        ? 'The Community Bank’s team will look out for your application. Your next step is to apply through SmartyGrants, below.'
+        : 'Someone from the Community Bank’s team will be in touch. This isn’t an application, and no decision has been made.'
+    }</p></div>`;
+    $('#ef-sent').focus();
+    return;
+  }
+  btn.disabled = false; btn.textContent = label;
+  const why = code === 'too_fast'
+    ? 'That was quicker than we expected, so it wasn’t sent. Please press the button again.'
+    : code === 'rate_limit'
+      ? 'We’ve had a lot of forms in a short time, so yours wasn’t sent. Please try again in a few minutes.'
+      : code === 'invalid'
+        ? 'Something in the form didn’t come through properly, so it wasn’t sent. Please check your details and try again.'
+        : 'Something went wrong at our end and your details were not sent. Please try again.';
+  status.innerHTML = `<div class="error-summary" role="alert" tabindex="-1" id="ef-fail"><h5>Your details were not sent</h5><p>${why} If it keeps happening, ${emailLink('email us')} instead.</p></div>`;
+  $('#ef-fail').focus();
 }
 
 /* ---------- Where the visitor came from ---------- */

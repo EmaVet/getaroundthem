@@ -100,6 +100,14 @@ li{margin-bottom:.35em}
 .arrow-cta:hover .circ{transform:translateX(4px)}
 @media (prefers-reduced-motion:reduce){.arrow-cta .circ{transition:none}}
 .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1rem 2rem;margin:1.75rem 0 0}
+/* Phones and small tablets: header and hero are centred */
+@media (max-width:55.99rem){
+  .site-head .wrap{justify-content:center}
+  .partners-wrap{justify-content:center}
+  .hero-copy{text-align:center}
+  .hero-lede{margin-left:auto;margin-right:auto}
+  .hero-actions{justify-content:center}
+}
 .text-link{font-family:var(--f-head);font-weight:600;color:#fff;text-underline-offset:.25em;min-height:44px;display:inline-flex;align-items:center}
 .text-link:hover{color:var(--tint-line)}
 .chips{list-style:none;padding:0;margin:.25rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem}

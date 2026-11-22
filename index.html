@@ -84,7 +84,9 @@ li{margin-bottom:.35em}
 @media (min-width:56rem){.hero-grid{grid-template-columns:5fr 3fr;gap:3rem}}
 .onair{display:inline-flex;align-items:center;gap:.6rem;margin:0 0 1.25rem;padding:.4rem .9rem .4rem .7rem;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);font-family:var(--f-mono);font-size:.85rem;letter-spacing:.02em}
 .onair-dot{width:10px;height:10px;border-radius:50%;background:var(--tint-line);box-shadow:0 0 0 0 rgba(168,207,194,.6);flex:none}
-.hero h1{color:#fff;font-weight:500;font-size:clamp(2.4rem,6vw + .4rem,4.25rem);line-height:1.14;letter-spacing:-.03em;margin-bottom:1.5rem;max-width:13ch}
+.hero h1{color:#fff;font-weight:500;font-size:clamp(2.2rem,6vw + .4rem,4rem);line-height:1.14;letter-spacing:-.03em;margin-bottom:1.5rem}
+.hero h1 .h1-main{display:block;text-wrap:balance}
+@media (min-width:56rem){.hero h1{font-size:clamp(2.6rem,4.6vw + .2rem,4rem)}}
 .hero h1 .h1-turn{display:block;color:var(--tint-line)}
 .hero-lede{font-size:clamp(1.15rem,1vw + .9rem,1.3rem);line-height:1.55;max-width:34rem;color:#EAF1EE}
 .btn-hero{background:var(--paper);border-color:var(--paper);color:var(--teal-hover)}
@@ -397,7 +399,7 @@ input[aria-invalid=true],textarea[aria-invalid=true]{border-color:var(--error);b
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <p class="onair"><span class="onair-dot" aria-hidden="true"></span>Heard it on 94.9 Power FM?</p>
-        <h1>Local groups hold this place together. <span class="h1-turn">Let’s get around them.</span></h1>
+        <h1><span class="h1-main">Local groups hold this place together.</span> <span class="h1-turn">Let’s get around them.</span></h1>
         <p class="hero-lede">Volunteers, charities and community groups make the Bay &amp; Basin what it is. If your not-for-profit needs funding to bring a project, event or community initiative to life, now’s the time to apply.</p>
         <div class="hero-actions">
           <a class="arrow-cta" href="#check">Check if your group could apply <span class="circ" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>

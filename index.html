@@ -105,6 +105,11 @@ li{margin-bottom:.35em}
   .site-head .wrap{justify-content:center}
   .partners-wrap{justify-content:center}
 }
+/* Wider screens: the header uses the hero's columns, so the partner logos start on the photo's left edge. */
+@media (min-width:56rem){
+  .site-head .wrap{display:grid;grid-template-columns:5fr 3fr;gap:3rem}
+  .partners-wrap{justify-self:start;flex-wrap:nowrap}
+}
 .text-link{font-family:var(--f-head);font-weight:600;color:#fff;text-underline-offset:.25em;min-height:44px;display:inline-flex;align-items:center}
 .text-link:hover{color:var(--tint-line)}
 .chips{list-style:none;padding:0;margin:.25rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem}
